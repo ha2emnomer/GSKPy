@@ -1,8 +1,8 @@
 
 
-This an implementation of Gaining-sharing knowlegde algorithm (GSK) in python. [GSK](https://link.springer.com/article/10.1007/s13042-019-01053-x) is a nature inspired algorithm for solving real parameter optimization problems. 
+This an implementation of Gaining-sharing knowledge algorithm (GSK) in python. [GSK](https://link.springer.com/article/10.1007/s13042-019-01053-x) is a nature inspired algorithm for solving real parameter optimization problems. 
 GSK has two main stages the junior and senior phases each has a different mutation, the dimensions (or parameters) are changed by the mutations of both the junior and senior phases
-at the same time. GSK is a reabile and stable otpimization algorithm. The repository also includes a visualization module for visualizing GSK runs.
+at the same time. GSK is a  reliable and stable optimization algorithm. The repository also includes a visualization module for visualizing GSK runs.
 The code have been tested on CEC 2017 benchmark functions. Two version of GSK the BasicGSK and BasicGSKLSPR (with linear propulation reduction).
 
 
@@ -42,7 +42,7 @@ We intend to realse a pip package soon with more examples. More work is done to 
 
 ## ✅&nbsp; Requirements
 
-python 2.7 or higher
-matplotlib (for visualization)
-CSVDataFrame (or any other package for saving results)
+**python 2.7 or higher
+**matplotlib (for visualization)
+**CSVDataFrame (or any other package for saving results)
 
