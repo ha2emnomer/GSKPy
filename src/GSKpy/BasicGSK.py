@@ -45,7 +45,7 @@ class BasicGSK(GSK):
         self.nfes  = 0
         self.fitness = None
         self.popold = None
-        self.LPSR =True
+        self.LPSR =LPSR
     def reset(self,k=10,kf=0.5,kr=0.9,p=0.1):
         #rest only rest parameters statistic are appended
         GSK.__init__(self,k,kf,kr,p)

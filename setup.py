@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="GSKpy",
-    version="1.3.1",
+    version="1.3.2",
     author="Hazem Nomer",
     author_email="h.nomer@nu.edu.eg",
     description="Gaining-sharing knowledge alorithm GSK for continuous optimization",
