@@ -29,9 +29,9 @@ def evaluateFun(coef,func_args=None):
         #print(mean_squared_error(diabetes_y_train, diabetes_y_pred))
         fitness_val.append(mean_squared_error(diabetes_y_train, diabetes_y_pred))
     return np.array(fitness_val)
-solver = BasicGSK(k=10,kf=0.5,kr=0.9,p=0.1)
-for i in range(5):
-    best , best_fit = solver.run(evaluateFun, dim, 100, [-1000]*dim, [1000]*dim,optimum=0, max_nfes=100000)
+solver = BasicGSK(evaluateFun, dim, 100, [-1000]*dim, [1000]*dim,max_nfes=100000)
+for i in range(30):
+    best , best_fit = solver.run(optimum=0)
     regr.coef_ = best
     diabetes_y_pred = regr.predict(diabetes_X_test)
     print()
