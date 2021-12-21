@@ -22,7 +22,7 @@ class Viz():
             dim: the number of dimensions of solution
             lb: list containing lower bounds for each dimension
             ub: list containing upper bounds for each dimension
-            func_args: args to be passed to evaluation function 
+            func_args: args to be passed to evaluation function
 
         """
         self.f = func
@@ -73,7 +73,7 @@ class Viz():
 
 
 
-    def build_plot(self,fig_size=(10,5),save=None):
+    def build_plot(self,fig_size=(10,5),save=None, show=True):
         """build an animated plot of GSK search in action
         Args:
             fig_size: fig_size for pyplot
@@ -169,9 +169,9 @@ class Viz():
             ani3.save(save+'.mp4')
         #lines_ani = animation.FuncAnimation(fig, update_pop, frames=len(self.pop_hist), init_func=init,
         #                                   interval=100, blit=False)
-
-        plt.show()
-        return plt
+        if show:
+            plt.show()
+        return fig, ani3
     def plot_losses(self,losses):
         """plot animated figure of the objective value
         Args:
