@@ -15,17 +15,33 @@ class Viz():
     Z = None
     data = None
 
-    def __init__(self,func,lb,ub,dim,func_num):
+    def __init__(self,func,lb,ub,dim,func_args=None):
+        """
+        Args:
+            func: the function to be evaluated for plotting.
+            dim: the number of dimensions of solution
+            lb: list containing lower bounds for each dimension
+            ub: list containing upper bounds for each dimension
+            func_args: args to be passed to evaluation function 
+
+        """
         self.f = func
         self.dim = dim
-        self.func_num = func_num
+        self.func_args = func_args
         #self.data  = data #data should be numpy array of shape(2,)
         self.lb = lb
         self.ub = ub
         #self.pop_hist = pop_hist
-    def set(self,dim,func_num,data,fitness,best,middle,worst):
+    def set(self,dim,data,fitness,best,middle,worst):
+        """set variables for plotting
+        Args:
+            dim: the number of dimensions of solution
+            data: the best value returned by getstatistics function in GSK
+            fitness: fitness values history
+            middle: middle indviduals history
+            worst: worst indviduals history
+        """
         self.dim = dim
-        self.func_num = func_num
         self.data = data
         self.best_hist = best
         self.middle_hist = middle
@@ -42,7 +58,7 @@ class Viz():
             for j in range(X.shape[1]):
                 hold = np.array([X[i,j],Y[i,j]]).reshape(1,2)
                 #print(self.dim,self.func_num)
-                Z[i,j] = self.f(hold,[2,self.func_num])
+                Z[i,j] = self.f(hold,self.func_args)
         return Z
 
     def update_best(self,num,data,line):
@@ -52,12 +68,18 @@ class Viz():
         #print(x,y)
         #print (num,x,y,self.f([x,y]))
         line.set_data(x,y)
-        line.set_3d_properties(self.f(np.array(self.data[num]).reshape(1,self.dim),[self.dim,self.func_num])[0], 'z')
+        line.set_3d_properties(self.f(np.array(self.data[num]).reshape(1,self.dim),self.func_args)[0], 'z')
         return line,
 
 
 
     def build_plot(self,fig_size=(10,5),save=None):
+        """build an animated plot of GSK search in action
+        Args:
+            fig_size: fig_size for pyplot
+            save: file name to save the animation
+        """
+
         fig = plt.figure(figsize=fig_size)
         ax = plt.axes(projection='3d')
         ax.contour3D(self.X, self.Y, self.Z, 50, cmap=cm.cool,alpha=0.3)
@@ -91,7 +113,7 @@ class Viz():
             #print(x,y)
             #print (num,x,y,self.f([x,y]))
             line.set_data(x,y)
-            line.set_3d_properties(self.f(np.array(self.data[num]).reshape(1,self.dim),[self.dim,self.func_num])[0], 'z')
+            line.set_3d_properties(self.f(np.array(self.data[num]).reshape(1,self.dim),self.func_args)[0], 'z')
 
 
             for j,l in enumerate(lines):
@@ -151,6 +173,10 @@ class Viz():
         plt.show()
         return plt
     def plot_losses(self,losses):
+        """plot animated figure of the objective value
+        Args:
+            losses: history of objective values from getstatistics function in GSK
+        """
         fig = plt.figure()
         ax = plt.axes(xlim=(0, 100), ylim=(-100, 0))
         N = 2

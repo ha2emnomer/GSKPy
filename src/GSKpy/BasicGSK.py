@@ -33,7 +33,7 @@ class BasicGSK(GSK):
         self.errors = []
         self.junior_dim = []
         self.fitness_vals = []
-        self.pop = None
+        self.pop = []
         self.problem_size = problem_size
         self.pop_size = pop_size
         if len(low) != self.problem_size or len(high) != self.problem_size:
@@ -65,7 +65,7 @@ class BasicGSK(GSK):
         min_pop_size = 12
 
 
-        if self.pop == None:
+        if len(self.pop) == 0:
             #create a new population if no population exists
             self.popold = np.concatenate([np.random.uniform(self.low[i], self.high[i], size=(self.pop_size,1)) for i in range(self.problem_size)], axis=1)
             self.pop = self.popold
@@ -189,13 +189,13 @@ class BasicGSK(GSK):
                             Kr = np.delete(Kr,worst_ind,0)
 
             if track:
-                new_pop = copy.deepcopy(pop)
-                new_best = copy.deepcopy(bsf_solution)
+                new_pop = copy.deepcopy(self.pop)
+                new_best = copy.deepcopy(self.bsf_solution)
                 self.pop_hist.append(new_pop)
                 self.best_hist.append(new_best)
-                self.best_pop_hist.append(pop[R1])
-                self.middle_pop_hist.append(pop[R2])
-                self.worst_pop_hist.append(pop[R3])
+                self.best_pop_hist.append(self.pop[R1])
+                self.middle_pop_hist.append(self.pop[R2])
+                self.worst_pop_hist.append(self.pop[R3])
                 self.fitness_vals.append([self.fitness[R1],self.fitness[R2],self.fitness[R3]])
                 self.errors.append(self.bsf_error_val)
                 self.junior_dim.append(D_Gained_Shared_Junior[0])
