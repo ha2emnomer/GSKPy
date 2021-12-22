@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import cm
 import math
-
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
 class Viz():
     f = None
     X  = None
@@ -78,13 +80,16 @@ class Viz():
         Args:
             fig_size: fig_size for pyplot
             save: file name to save the animation
+            show: show the animated figure in matplotlib window
         """
-
+        if len(self.best_hist) <=0 or len(self.middle_hist) <=0 or len(self.worst_hist) <=0:
+            raise Error('History is empty, make sure you set track=True in run() function')
         fig = plt.figure(figsize=fig_size)
         ax = plt.axes(projection='3d')
         ax.contour3D(self.X, self.Y, self.Z, 50, cmap=cm.cool,alpha=0.3)
         ax.view_init(60, 35)
         l, = plt.plot([], [], markerfacecolor='g', markeredgecolor='k', marker='o', label='best value', markersize=30, alpha=0.3)
+
         lines = [plt.plot([], [], markerfacecolor='b', markeredgecolor='b', marker='o', markersize=5, alpha=0.5)[0] for _ in range(self.best_hist[0].shape[0])]
         lines2 = [plt.plot([], [], markerfacecolor='m', markeredgecolor='m', marker='|', markersize=9, alpha=0.5)[0] for _ in range(self.middle_hist[0].shape[0])]
         lines3 = [plt.plot([], [], markerfacecolor='y', markeredgecolor='y', marker='x',markersize=5, alpha=0.5)[0] for _ in range(self.worst_hist[0].shape[0])]
@@ -163,7 +168,7 @@ class Viz():
 
         #best_indv_ani = animation.FuncAnimation(fig, self.update_best, self.data.shape[0], fargs=(self.data,l),
         #                                   interval=100, blit=False)
-        ani3 = animation.FuncAnimation(fig, update, len(self.best_hist),init_func=init ,fargs=(self.data,l),
+        ani3 = animation.FuncAnimation(fig, update, len(self.best_hist),init_func=init,fargs=(self.data,l),
                                                                            interval=100, blit=False)
         if save != None:
             ani3.save(save+'.mp4')

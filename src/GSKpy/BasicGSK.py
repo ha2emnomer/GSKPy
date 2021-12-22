@@ -6,6 +6,9 @@ from GSKpy.Gained_Shared_Senior_R1R2R3 import Gained_Shared_Senior_R1R2R3
 from GSKpy.Gained_Shared_Middle_R1R2R3 import Gained_Shared_Middle_R1R2R3
 from GSKpy.boundConstraint import boundConstraint
 from GSKpy.GSK import GSK
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
 class BasicGSK(GSK):
     def __init__(self,evaluation_func,problem_size,pop_size,low,high,max_nfes=1000,func_args=None,bound_constraint="default",LPSR=False,k=10,kf=0.5,kr=0.9,p=0.1):
         """
@@ -37,7 +40,7 @@ class BasicGSK(GSK):
         self.problem_size = problem_size
         self.pop_size = pop_size
         if len(low) != self.problem_size or len(high) != self.problem_size:
-            raise('Low and high bounadries should be as the same size of problem_size')
+            raise Error('Low and high bounadries should be as the same size of problem_size')
         self.low = low
         self.high = high
         self.bound_constraint = bound_constraint
@@ -83,8 +86,9 @@ class BasicGSK(GSK):
                 if self.fitness[i] < self.bsf_fit_var:
                     self.bsf_fit_var = self.fitness[i]
             self.bsf_error_val=self.bsf_fit_var - optimum
-            self.pop_hist = [self.pop]
-            self.best_hist = [self.bsf_solution]
+            if track:
+                self.pop_hist = [self.pop]
+                self.best_hist = [self.bsf_solution]
         K = np.full((self.pop_size, 1), self.K, dtype=int)
         Kf = np.array([self.Kf]*self.pop_size).reshape(self.pop_size,1)
         Kr = np.array([self.Kr]*self.pop_size).reshape(self.pop_size,1)

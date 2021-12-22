@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="GSKpy",
-    version="1.3.3",
+    version="1.3.8",
     author="Hazem Nomer",
     author_email="h.nomer@nu.edu.eg",
-    description="Gaining-sharing knowledge alorithm GSK for continuous optimization",
+    description="Gaining-sharing knowledge algorithm GSK continuous optimization framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ha2emnomer/GSKPy",
