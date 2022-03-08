@@ -32,7 +32,7 @@ def evaluateFun(coef,func_args=None):
 
 for i in range(30):
     solver = BasicGSK(evaluateFun, dim, 200, [-1000]*dim,[1000]*dim,LPSR=True,kr=0.1,max_nfes=100000)
-    g,best , best_fit, loss = solver.run(optimum=0)
+    g, best , best_fit, loss = solver.run(optimum=0)
     regr.coef_ = best
     diabetes_y_pred = regr.predict(diabetes_X_test)
     print()

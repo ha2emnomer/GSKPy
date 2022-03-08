@@ -10,7 +10,7 @@ class Error(Exception):
     """Base class for exceptions in this module."""
     pass
 class BasicGSK(GSK):
-    def __init__(self,evaluation_func,problem_size,pop_size,low,high,max_nfes=1000,func_args=None,bound_constraint="default",LPSR=False,k=10,kf=0.5,kr=0.9,p=0.1):
+    def __init__(self,evaluation_func,problem_size,pop_size,low,high,max_nfes=1000,func_args=None,bound_constraint="default",direction="min",LPSR=False,k=10,kf=0.5,kr=0.9,p=0.1):
         """
         Args:
             evaluation_func: the function to be evaluated.
@@ -21,6 +21,7 @@ class BasicGSK(GSK):
             max_nfes: maximum number of function evaluations
             func_args: a list containing args to be passed to evaluation_func
             bound_constraint: function to limit the values of solutions "default" uses the default boundConstraint function
+            direction: "min" or "max" for minimization and maximization problems.
             LPSR: if True Linear population size reduction is used
             k:factor for experience equation that determines the number of dimensions for junior phase
             kf: knowledge factor
@@ -44,6 +45,10 @@ class BasicGSK(GSK):
         self.low = low
         self.high = high
         self.bound_constraint = bound_constraint
+        if direction == "min" or direction == "max":
+            self.direction = direction
+        else:
+            self.direction = "min"
         self.max_nfes = max_nfes
         self.nfes  = 0
         self.fitness = None
@@ -75,15 +80,19 @@ class BasicGSK(GSK):
             self.fitness = self.evaluation_func(self.pop,self.func_args)
 
             self.nfes = 0
-
-            self.bsf_fit_var = 1e+300
+            if self.direction == "min":
+                self.bsf_fit_var = 1e+300
+            else:
+                self.bsf_fit_var = 1e-300
             self.bsf_solution = self.popold[0]
             for i in range(self.pop_size):
                 self.nfes = self.nfes + 1
 
                 if self.nfes > self.max_nfes:
                     break
-                if self.fitness[i] < self.bsf_fit_var:
+                if self.fitness[i] < self.bsf_fit_var and self.direction == "min":
+                    self.bsf_fit_var = self.fitness[i]
+                elif self.fitness[i] > self.bsf_fit_var and self.direction == "max":
                     self.bsf_fit_var = self.fitness[i]
             self.bsf_error_val=self.bsf_fit_var - optimum
             if track:
@@ -99,9 +108,10 @@ class BasicGSK(GSK):
 
             self.pop = self.popold
             pop = self.pop #avoid meesy code with self.pop
-
-            indBest = np.argsort(self.fitness)	# if fitness not np array use x = np.array([3, 1, 2]) to convert it
-
+            if self.direction == "min":
+                indBest = np.argsort(self.fitness)	# if fitness not np array use x = np.array([3, 1, 2]) to convert it
+            else:
+                indBest = np.argsort(self.fitness)[::-1]
             Rg1,Rg2,Rg3 = Gained_Shared_Junior_R1R2R3(indBest)
 
             R1,R2,R3 = Gained_Shared_Senior_R1R2R3(indBest,self.p)
@@ -110,8 +120,10 @@ class BasicGSK(GSK):
 
             Gained_Shared_Junior = np.zeros((self.pop_size,self.problem_size))
 
-
-            ind1 = self.fitness[R01] > self.fitness[Rg3] # fitness must be np.array
+            if self.direction =="min":
+                ind1 = self.fitness[R01] > self.fitness[Rg3] # fitness must be np.array
+            else:
+                ind1 = self.fitness[R01] < self.fitness[Rg3]
             if np.sum(ind1) > 0:
                 Gained_Shared_Junior[ind1,:] = pop[ind1,:] + Kf[ind1,:] * np.ones((np.sum(ind1),self.problem_size)) * (pop[Rg1[ind1],:] - pop[Rg2[ind1],:] + pop[Rg3[ind1],:] - pop[ind1,:])
 
@@ -121,8 +133,10 @@ class BasicGSK(GSK):
             R0 = range(self.pop_size)
 
             Gained_Shared_Senior = np.zeros((self.pop_size,self.problem_size))
-
-            ind = self.fitness[R0] > self.fitness[R2]
+            if self.direction == "min":
+                ind = self.fitness[R0] > self.fitness[R2]
+            else:
+                ind = self.fitness[R0] < self.fitness[R2]
             if np.sum(ind) > 0:
                 Gained_Shared_Senior[ind,:] = pop[ind,:] + Kf[ind,:] * np.ones((np.sum(ind),self.problem_size)) * (pop[R1[ind],:] - pop[ind,:] + pop[R2[ind],:] - pop[R3[ind],:])
 
@@ -156,7 +170,10 @@ class BasicGSK(GSK):
                 self.nfes = self.nfes + 1
                 if self.nfes > self.max_nfes:
                     break
-                if children_fitness[i] < self.bsf_fit_var:
+                if children_fitness[i] < self.bsf_fit_var and self.direction == "min":
+                    self.bsf_fit_var = children_fitness[i]
+                    self.bsf_solution = ui[i,:]
+                elif children_fitness[i] > self.bsf_fit_var and self.direction == "max":
                     self.bsf_fit_var = children_fitness[i]
                     self.bsf_solution = ui[i,:]
 
@@ -167,13 +184,16 @@ class BasicGSK(GSK):
 
 
             conc = np.concatenate((self.fitness.reshape(-1,1),children_fitness.reshape(-1,1)), axis=1)
-            Child_is_better_index = conc.argmin(axis=1)
+            if self.direction == "min":
+                Child_is_better_index = conc.argmin(axis=1)
+            else:
+                Child_is_better_index = conc.argmax(axis=1)
 
             self.fitness = conc[range(conc.shape[0]),Child_is_better_index]#.reshape(-1, 1)
             self.popold = pop
             self.popold[Child_is_better_index == 1,:] = ui[Child_is_better_index == 1,:]
             #Linear population size reduction
-            if self.LPSR:
+            if self.LPSR and self.direction == "max":
                 plan_pop_size = round((min_pop_size - max_pop_size) * ((self.nfes / self.max_nfes) ** (1)) + max_pop_size)
                 best_idx = np.argsort(self.fitness)[0]
                 if self.pop_size > plan_pop_size:

@@ -169,7 +169,7 @@ class Viz():
         #best_indv_ani = animation.FuncAnimation(fig, self.update_best, self.data.shape[0], fargs=(self.data,l),
         #                                   interval=100, blit=False)
         ani3 = animation.FuncAnimation(fig, update, len(self.best_hist),init_func=init,fargs=(self.data,l),
-                                                                           interval=100, blit=False)
+                                                                           interval=20, blit=False)
         if save != None:
             ani3.save(save+'.mp4')
         #lines_ani = animation.FuncAnimation(fig, update_pop, frames=len(self.pop_hist), init_func=init,
